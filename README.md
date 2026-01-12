@@ -1,6 +1,6 @@
 # 🛡️ Hybrid IDS: XGBoost + SHAP + LLM for Edge-Deployable Intrusion Detection
 
-A research-grade **Intrusion Detection System** combining XGBoost classification, SHAP explainability, and quantized LLM narrative generation — optimized for edge deployment.
+A hybrid **Intrusion Detection System** combining XGBoost classification, SHAP explainability, and quantized LLM narrative generation — optimized for edge deployment.
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![XGBoost](https://img.shields.io/badge/XGBoost-1.7+-green.svg)
