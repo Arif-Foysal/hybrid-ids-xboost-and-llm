@@ -1,4 +1,4 @@
-# 🛡️ Hybrid IDS: XGBoost + SHAP + LLM for Edge-Deployable Intrusion Detection
+# Hybrid IDS: XGBoost + SHAP + LLM for Edge-Deployable Intrusion Detection
 
 A hybrid **Intrusion Detection System** combining XGBoost classification, SHAP explainability, and quantized LLM narrative generation — optimized for edge deployment.
 
@@ -8,7 +8,7 @@ A hybrid **Intrusion Detection System** combining XGBoost classification, SHAP e
 ![Transformers](https://img.shields.io/badge/HuggingFace-Transformers-yellow.svg)
 ![License](https://img.shields.io/badge/License-MIT-brightgreen.svg)
 
-## 📋 Abstract
+## Abstract
 
 This project implements a **5-phase hybrid intrusion detection pipeline**:
 
@@ -22,7 +22,7 @@ This project implements a **5-phase hybrid intrusion detection pipeline**:
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
@@ -36,7 +36,7 @@ This project implements a **5-phase hybrid intrusion detection pipeline**:
 
 ---
 
-## 📊 Performance Summary
+## Performance Summary
 
 ### Detection Engine Comparison (Phase 2)
 
@@ -65,7 +65,7 @@ This project implements a **5-phase hybrid intrusion detection pipeline**:
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -110,7 +110,7 @@ jupyter lab ids.ipynb
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 hybrid-ids-xboost-and-llm/
@@ -147,7 +147,7 @@ hybrid-ids-xboost-and-llm/
 
 ---
 
-## 📚 Notebook Structure (ids.ipynb)
+## Notebook Structure (ids.ipynb)
 
 ### Phase 1: Data Curation & Preprocessing (Cells 1-22)
 
@@ -228,7 +228,7 @@ hybrid-ids-xboost-and-llm/
 
 ---
 
-## 🔧 Technical Details
+## Technical Details
 
 ### Dataset: UNSW-NB15
 
@@ -270,7 +270,7 @@ BitsAndBytesConfig(
 
 ---
 
-## 📈 Generated Outputs
+## Generated Outputs
 
 After running all phases, the following files are created:
 
@@ -289,7 +289,7 @@ After running all phases, the following files are created:
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/new-feature`
@@ -307,7 +307,7 @@ After running all phases, the following files are created:
 
 ---
 
-## 📄 Citation
+## Citation
 
 If you use this work, please cite:
 
@@ -332,7 +332,7 @@ If you use this work, please cite:
 
 ---
 
-## 📜 License
+## License
 
 MIT License - see [LICENSE](LICENSE) file.
 
