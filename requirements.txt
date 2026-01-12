@@ -1,0 +1,17 @@
+numpy
+pandas
+scikit-learn
+xgboost
+optuna
+shap
+matplotlib
+seaborn
+torch
+transformers
+bitsandbytes
+accelerate
+sentencepiece
+protobuf
+psutil
+tqdm
+ipywidgets
