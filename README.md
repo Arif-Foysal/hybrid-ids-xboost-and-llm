@@ -18,7 +18,7 @@ This project implements a **5-phase hybrid intrusion detection pipeline**:
 4. **Phase 4:** 4-bit quantized LLM for human-readable security narratives
 5. **Phase 5:** Edge feasibility analysis with latency and resource profiling
 
-**Key Contribution:** Complete offline IDS pipeline achieving **~90% accuracy** with **sub-millisecond detection latency** and **<8GB VRAM** for the full stack.
+**Key Contribution:** Complete offline IDS pipeline achieving **~90% accuracy** with **sub-millisecond detection latency** and **<2GB VRAM** for the full stack (4-bit quantized LLM).
 
 ---
 
@@ -42,26 +42,35 @@ This project implements a **5-phase hybrid intrusion detection pipeline**:
 
 | Model | Accuracy | Precision | Recall | F1-Score | AUC-ROC | Inference Speed |
 |-------|----------|-----------|--------|----------|---------|-----------------|
-| **XGBoost (Baseline)** | 90.11% | 98.68% | 86.63% | 92.26% | 98.53% | **321,884/sec** |
-| XGBoost (Optuna) | 89.65% | 98.97% | 85.68% | 91.85% | 98.61% | 101,845/sec |
-| Random Forest | 90.12% | 98.89% | 86.45% | 92.25% | 98.63% | 57,059/sec |
-| DNN (3-layer) | 91.54% | 97.03% | 90.34% | 93.56% | 97.91% | 29,576/sec |
+| **XGBoost (Baseline)** | 90.11% | 98.68% | 86.63% | 92.26% | 98.53% | **371,745/sec** |
+| XGBoost (Optuna) | 89.65% | 98.97% | 85.68% | 91.85% | 98.61% | 371,745/sec |
+| Random Forest | 90.12% | 98.89% | 86.45% | 92.25% | 98.63% | 215,034/sec |
+| DNN (3-layer) | 91.88% | 96.85% | 91.03% | 93.85% | 98.12% | 17,028/sec |
 
 ### Pipeline Latency (Phase 5)
 
-| Component | Latency | Target | Status |
-|-----------|---------|--------|--------|
-| XGBoost Detection | ~0.003 ms/sample | < 10 ms | ✅ |
-| SHAP Explanation | ~10-50 ms/sample | < 500 ms | ✅ |
-| LLM Generation | ~10-13 sec/narrative | < 30 sec | ✅ |
+| Component | Latency | Real-time Capability | Status |
+|-----------|---------|---------------------|--------|
+| XGBoost Detection | 18.46 ms | ✓ Sub-millisecond per sample | ✅ |
+| SHAP Explanation | 6.49 ms | ✓ Real-time (< 100ms) | ✅ |
+| LLM Generation | ~9.9 sec | ⚠ Batch mode recommended | ✅ |
+| **Full Pipeline** | ~9.97 sec | ~6 alerts/min with narrative | ✅ |
 
-### Resource Requirements
+### Resource Requirements (Measured)
 
-| Resource | Peak Usage | Edge Target |
-|----------|------------|-------------|
-| System RAM | < 8 GB | < 16 GB |
-| GPU VRAM | ~3-4 GB | < 8 GB |
-| Model Size | ~1.5 GB (quantized) | < 4 GB |
+| Resource | Peak Usage | Minimum Requirement |
+|----------|------------|---------------------|
+| System RAM | **9.24 GB** | 14 GB minimum |
+| GPU VRAM | **1.13 GB** | 4 GB minimum (for LLM) |
+| CPU | 100% (during LLM) | Multi-core recommended |
+
+### Deployment Modes (Phase 5 Recommendations)
+
+| Mode | Hardware | Use Case | Throughput |
+|------|----------|----------|------------|
+| **Full Edge** | Laptop/Mini-PC (GTX 1650+, 16GB RAM) | Standalone small network IDS | ~6 alerts with narrative/min |
+| **Tiered Edge** (Recommended) | Raspberry Pi 4 / Jetson Nano + Server | Detection at edge, LLM on-demand | 100,000+ detections/sec |
+| **Cloud-Hybrid** | Minimal edge + Cloud | Large enterprise | Unlimited (cloud-scaled) |
 
 ---
 
@@ -165,19 +174,22 @@ hybrid-ids-xboost-and-llm/
 | Step | Description | Key Output |
 |------|-------------|------------|
 | 2.1 | Train baseline XGBoost | 90.11% accuracy |
-| 2.2 | Optuna HPO (50 trials) | Best params JSON |
+| 2.2 | Optuna HPO (50 trials) | Best F1-CV: 0.9204 |
 | 2.3 | Train Random Forest + DNN | Comparison table |
 | 2.4 | Generate visualizations | Confusion matrices, ROC curves |
 
-**Optuna Search Space:**
+**Optuna Best Hyperparameters:**
 ```python
 {
-    'max_depth': [3, 12],
-    'learning_rate': [0.01, 0.3],
-    'n_estimators': [100, 1000],
-    'min_child_weight': [1, 10],
-    'subsample': [0.6, 1.0],
-    'colsample_bytree': [0.6, 1.0]
+    'max_depth': 12,
+    'learning_rate': 0.0144,
+    'n_estimators': 239,
+    'min_child_weight': 4,
+    'subsample': 0.755,
+    'colsample_bytree': 0.949,
+    'gamma': 2.4,
+    'reg_alpha': 1.19e-05,
+    'reg_lambda': 1.18e-05
 }
 ```
 
@@ -201,8 +213,8 @@ hybrid-ids-xboost-and-llm/
 
 | Step | Description | Key Output |
 |------|-------------|------------|
-| 4.1 | Load Qwen2.5-1.5B-Instruct (4-bit) | ~3GB VRAM |
-| 4.2 | Dynamic prompt template | Security-focused prompts |
+| 4.1 | Load Qwen2.5-1.5B-Instruct (4-bit) | ~1.13GB VRAM |
+| 4.2 | Dynamic prompt template (ChatML) | Security-focused prompts |
 | 4.3 | Batch generation (50 attacks) | Narrative CSV |
 | 4.4 | Raw vs. generated comparison | Before/after table |
 
@@ -221,10 +233,15 @@ hybrid-ids-xboost-and-llm/
 
 | Step | Description | Key Output |
 |------|-------------|------------|
-| 5.1 | Latency benchmarks | Per-component timing |
-| 5.2 | Resource monitoring | CPU/RAM/VRAM profiles |
-| 5.3 | Scalability analysis | Throughput vs batch size |
-| 5.4 | Deployment recommendations | Edge device compatibility |
+| 5.1 | Latency benchmarks | XGBoost: 18ms, SHAP: 6ms, LLM: ~10s |
+| 5.2 | Resource monitoring | Peak RAM: 9.24GB, VRAM: 1.13GB |
+| 5.3 | Scalability analysis | Optimal: 5000 samples @ 531,255/sec |
+| 5.4 | Deployment recommendations | 3 modes: Full Edge, Tiered, Cloud-Hybrid |
+
+**Generated Files:**
+- `edge_feasibility_analysis.png` - Latency, throughput, and resource visualizations
+- `edge_feasibility_metrics.json` - Complete performance metrics in JSON format
+- `edge_feasibility_table.csv` - Paper-ready metrics table
 
 ---
 
